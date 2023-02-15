@@ -1,0 +1,21 @@
+<PARAM>
+    <GRP ID="PTH0_1">
+        <FLD NAM="PRHFCY">ME140</FLD>
+        <FLD NAM="BPSNUM">CIGO0000</FLD>
+        <FLD NAM="RCPDAT">2023/01/23</FLD>
+        <FLD NAM="NDEDAT">2023/01/23</FLD>
+        <FLD NAM="CUR">MAD</FLD>
+    </GRP>
+    
+    <TAB ID="PTH1_2">
+        <LIN>
+            <FLD NAM="POHNUM">ME1402212POH00000007</FLD>
+            <FLD NAM="ITMREF" >VIDEBIER</FLD>
+            <FLD NAM="ITMDES" >TVIDE BOUTELLE BRASSERIE</FLD>
+            <FLD NAM="ITMDES1">VIDE BOUTELLE BRASSERIE</FLD>
+            <FLD NAM="ITMKND">1</FLD>
+            <FLD NAM="UOM">UN</FLD>
+            <FLD NAM="QTYUOM">1050</FLD>
+        </LIN>
+    </TAB>
+</PARAM>
