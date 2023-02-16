@@ -145,9 +145,11 @@ if (isset($_SESSION["x3login"])) {
                 if (d.PRCPQTY != d.SHIQTY) {
                   $(row).css("background-color", "red");
                   $(row).css("color", "white");
+                 // $('#save').prop("disabled",true);
                 } else if (d.PRCPQTY == d.SHIQTY) {
                   $(row).css("background-color", "#50c878");
                   $(row).css("color", "white");
+                  //$('#save').prop("disabled",true);
                 }
 
                 $(row).attr("id", 'row-' + d.EANCOD);
@@ -176,6 +178,14 @@ if (isset($_SESSION["x3login"])) {
 
             //save data in sage
             $("#save").click(function() {
+              var isEquivalent = true;
+              $.each(d, function(key, value) {
+                        if (d.PRCPQTY == d.SHIQTY) {
+                          isEquivalent = false;
+                          return false;
+                        }
+                      });
+                      console.log(isEquivalent);
               var sohNum2 = $("#searchs :selected").text();
               var datass = localStorage.getItem(sohNum2);
 
@@ -198,7 +208,7 @@ if (isset($_SESSION["x3login"])) {
                     });
                     sohNum2 = '';
                     datass = '';
-                    location.reload();
+                    //location.reload();
                   } else {
                     Swal.fire({
                       icon: 'error',
@@ -209,7 +219,7 @@ if (isset($_SESSION["x3login"])) {
                     });
                     sohNum2 = '';
                     datass = '';
-                    location.reload();
+                    //location.reload();
                   }
 
                 }
@@ -245,11 +255,17 @@ if (isset($_SESSION["x3login"])) {
                       quantite = 'erorr';
                     }
                     if (result.isConfirmed && quantite != 'erorr') {
-                      //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+
+          //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
                       $.each(d, function(key, value) {
                         if (d[key].EANCOD == pastedData) {
                           d[key].PRCPQTY = quantite;
                           table.search('').draw();
+                          localStorage.removeItem(sohNum);
+                          localStorage.setItem(sohNum, JSON.stringify(d));
+                          table.clear().rows.add(d).draw();
+                          table.search('').draw();
+                          $('div.dataTables_filter input', table.table().container()).focus();
                         }
                       });
 
@@ -342,7 +358,7 @@ if (isset($_SESSION["x3login"])) {
                 });
                 sohNum2 = '';
                 datass = '';
-                location.reload();
+                //location.reload();
               } else {
                 Swal.fire({
                   icon: 'error',
@@ -353,7 +369,7 @@ if (isset($_SESSION["x3login"])) {
                 });
                 sohNum2 = '';
                 datass = '';
-                location.reload();
+                //location.reload();
               }
 
             }

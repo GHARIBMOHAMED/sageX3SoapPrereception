@@ -3,7 +3,7 @@ require_once('WebService/models/PreCommand.php');
 
 $order = new PreCommande();
  //var_dump($order->showListe());
- echo "<pre>".print_r($order->showOne("SHP2208-00000002"),true)."</pre>";
+ echo "<pre>".print_r($order->showOne("SHP1812-00000001"),true)."</pre>";
  //print_r( $order->showOne("SHP2208-00000002"));
  //   echo $order->showListe();
 

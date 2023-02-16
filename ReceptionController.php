@@ -21,10 +21,12 @@ if(isset($_POST["user"]) && !empty($_POST["user"])){
     $WS .= "<TAB ID=\"PTH1_2\">";
     foreach($data as $d) {
         $WS .= "<LIN>";
+        $WS .= "<FLD NAME=\"PTHNUM\" TYPE=\"Char\">". $d["POHNUM"]."</FLD>";
         $WS .= "<FLD NAME=\"ITMREF\">". $d["ITMREF"] ."</FLD>";
         $WS .= "<FLD NAM=\"ITMKND\">1</FLD>";
         $WS .= "<FLD NAM=\"UOM\">". $d["UOM"] ."</FLD>";
         $WS .= "<FLD NAM=\"QTYUOM\">". $d["PRCPQTY"] ."</FLD>";
+        $WS .= "<FLD NAM=\"WSOLDE\">1</FLD>";
         $WS .= "</LIN>";
     }
     $WS .= "</TAB></PARAM>";

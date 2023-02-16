@@ -22,7 +22,7 @@ class PreCommande extends ModelX3 {
 				"ITMREF"=>$ligne["ITMREF"],
 				"SHIQTY"=>$ligne["SHIQTY"],
 				"ITMDES"=>$ligne["ITMDES"],
-				"PRCPQTY"=>$ligne["PRCPQTY"],
+				"PRCPQTY"=>0,
 				"POHFCY"=>$ligne["POHFCY"],
 				"UOM"=>$ligne["UOM"],
 				"NETCUR"=>$ligne["NETCUR"],
@@ -56,10 +56,6 @@ class PreCommande extends ModelX3 {
 		return $str;
 	}
 	
-	
-	function create($WS) {
-		
-	}
 	
 	function getBarcode($crit) {
 		$WS_ORDER = "WITM";
