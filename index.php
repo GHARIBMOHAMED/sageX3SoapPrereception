@@ -70,8 +70,7 @@ if (isset($_SESSION["x3login"])) {
         </div>
         <div class="panel" id="hidden2">
           <div class="panel__btns">
-            <button class="button-stroke panel__button " id="save">Créer</button>
-            <button class="button panel__button" id="sold">Solder réception</button>
+            <button class="button panel__button" id="save">Créer</button>
             <div class="actions actions_up">
               <button class="actions__button">
                 <svg class="icon icon-more-horizontal">
