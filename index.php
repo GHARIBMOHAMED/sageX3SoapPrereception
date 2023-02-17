@@ -145,7 +145,7 @@ if (isset($_SESSION["x3login"])) {
                 if (d.PRCPQTY != d.SHIQTY) {
                   $(row).css("background-color", "red");
                   $(row).css("color", "white");
-                 // $('#save').prop("disabled",true);
+                  // $('#save').prop("disabled",true);
                 } else if (d.PRCPQTY == d.SHIQTY) {
                   $(row).css("background-color", "#50c878");
                   $(row).css("color", "white");
@@ -175,57 +175,8 @@ if (isset($_SESSION["x3login"])) {
               ]
             });
             $('div.dataTables_filter input', table.table().container()).focus();
-
-            //save data in sage
-            $("#save").click(function() {
-              var isEquivalent = true;
-              $.each(d, function(key, value) {
-                        if (d.PRCPQTY == d.SHIQTY) {
-                          isEquivalent = false;
-                          return false;
-                        }
-                      });
-                      console.log(isEquivalent);
-              var sohNum2 = $("#searchs :selected").text();
-              var datass = localStorage.getItem(sohNum2);
-
-              $.ajax({
-                type: "POST",
-                url: 'ReceptionController.php',
-                data: {
-                  user: JSON.parse(datass)
-                },
-                success: function(response) {
-                  console.log(response.replace(/\s/g, ''))
-                  if (response.replace(/\s/g, '') == "1") {
-                    localStorage.removeItem(sohNum2)
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Succes',
-                      text: 'Réception crée avec succes',
-                      showConfirmButton: false,
-                      timer: 2000
-                    });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
-                  } else {
-                    Swal.fire({
-                      icon: 'error',
-                      title: 'Succes',
-                      text: 'quelque chose s\'est mal passé',
-                      showConfirmButton: false,
-                      timer: 2000
-                    });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
-                  }
-
-                }
-              });
-            });
-
+            // function
+            //save(d);
             $('.dataTables_filter input').bind('keypress', function(e) {
               if (e.which == 13 || e.originalEvent.clipboardData != null) {
                 if (e.originalEvent.clipboardData != null) {
@@ -256,7 +207,7 @@ if (isset($_SESSION["x3login"])) {
                     }
                     if (result.isConfirmed && quantite != 'erorr') {
 
-          //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+                      //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
                       $.each(d, function(key, value) {
                         if (d[key].EANCOD == pastedData) {
                           d[key].PRCPQTY = quantite;
@@ -335,46 +286,7 @@ if (isset($_SESSION["x3login"])) {
           ],
         });
         //save data in sage
-        $("#save").click(function() {
-          var sohNum2 = $("#searchs :selected").text();
-          var datass = localStorage.getItem(sohNum2);
-
-          $.ajax({
-            type: "POST",
-            url: 'ReceptionController.php',
-            data: {
-              user: JSON.parse(datass)
-            },
-            success: function(response) {
-              console.log(response.replace(/\s/g, ''))
-              if (response.replace(/\s/g, '') == "1") {
-                localStorage.removeItem(sohNum2)
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Succes',
-                  text: 'Réception crée avec succes',
-                  showConfirmButton: false,
-                  timer: 2000
-                });
-                sohNum2 = '';
-                datass = '';
-                //location.reload();
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Succes',
-                  text: 'quelque chose s\'est mal passé',
-                  showConfirmButton: false,
-                  timer: 2000
-                });
-                sohNum2 = '';
-                datass = '';
-                //location.reload();
-              }
-
-            }
-          });
-        });
+        save(d2);
 
         $('div.dataTables_filter input', table.table().container()).focus();
         $('.dataTables_filter input').bind('keypress', function(e) {
@@ -451,8 +363,59 @@ if (isset($_SESSION["x3login"])) {
       }
     });
 
-
   });
+  function save(d){
+      //save data in sage
+      $("#save").click(function(d) {
+              var isEquivalent = true;
+              $.each(d, function(key, value) {
+                if (d.PRCPQTY != d.SHIQTY) {
+                  isEquivalent = false;
+                  return false
+                }
+              });
+              if (isEquivalent) {
+              var sohNum2 = $("#searchs :selected").text();
+              var datass = localStorage.getItem(sohNum2);
+
+              $.ajax({
+                type: "POST",
+                url: 'ReceptionController.php',
+                data: {
+                  user: JSON.parse(datass)
+                },
+                success: function(response) {
+                  console.log(response.replace(/\s/g, ''))
+                  if (response.replace(/\s/g, '') == "1") {
+                    localStorage.removeItem(sohNum2)
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Succes',
+                      text: 'Réception crée avec succes',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Succes',
+                      text: 'quelque chose s\'est mal passé',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  }
+
+                }
+              });
+            }
+            });
+    }
 </script>
 
 </html>

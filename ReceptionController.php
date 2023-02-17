@@ -21,7 +21,7 @@ if(isset($_POST["user"]) && !empty($_POST["user"])){
     $WS .= "<TAB ID=\"PTH1_2\">";
     foreach($data as $d) {
         $WS .= "<LIN>";
-        $WS .= "<FLD NAME=\"PTHNUM\" TYPE=\"Char\">". $d["POHNUM"]."</FLD>";
+        $WS .= "<FLD NAME=\"POHNUM\" TYPE=\"Char\">". $d["POHNUM"]."</FLD>";
         $WS .= "<FLD NAME=\"ITMREF\">". $d["ITMREF"] ."</FLD>";
         $WS .= "<FLD NAM=\"ITMKND\">1</FLD>";
         $WS .= "<FLD NAM=\"UOM\">". $d["UOM"] ."</FLD>";
@@ -40,7 +40,7 @@ if(isset($_POST["user"]) && !empty($_POST["user"])){
         }
     } catch (SoapFault $e) {
         
-        return print_r(json_encode(0)) ;
+        return print_r(json_encode(2)) ;
     }
 }
 
