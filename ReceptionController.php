@@ -27,6 +27,8 @@ if(isset($_POST["user"]) && !empty($_POST["user"])){
         $WS .= "<FLD NAM=\"UOM\">". $d["UOM"] ."</FLD>";
         $WS .= "<FLD NAM=\"QTYUOM\">". $d["PRCPQTY"] ."</FLD>";
         $WS .= "<FLD NAM=\"WSOLDE\">1</FLD>";
+        // $WS .= "<FLD NAM=\"WCLEFLG\">1</FLD>";
+        // $WS .= "<FLD NAM=\"LININVFLG\">1</FLD>";
         $WS .= "</LIN>";
     }
     $WS .= "</TAB></PARAM>";

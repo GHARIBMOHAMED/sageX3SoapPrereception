@@ -40,14 +40,15 @@ if (isset($_SESSION["x3login"])) {
           </div>
           <div class="field">
             <div class="field__wrap">
-              <select class="select" id="searchs" name="formsohnum">
+              <!-- <select class="select" id="searchs" name="formsohnum">
                 <option>Selectionez préreception</option>
                 <?php
-                require_once('WebService/models/PreCommand.php');
-                $order = new PreCommande();
-                echo $order->showListe();
+                // require_once('WebService/models/PreCommand.php');
+                // $order = new PreCommande();
+                // echo $order->showListe();
                 ?>
-              </select>
+              </select> -->
+              <input class="field__input" id="searchs"  placeholder="Scanner">
             </div>
           </div>
 
@@ -69,7 +70,7 @@ if (isset($_SESSION["x3login"])) {
         </div>
         <div class="panel" id="hidden2">
           <div class="panel__btns">
-            <button class="button-stroke panel__button" id="save">Créer</button>
+            <button class="button-stroke panel__button " id="save">Créer</button>
             <button class="button panel__button" id="sold">Solder réception</button>
             <div class="actions actions_up">
               <button class="actions__button">
@@ -117,10 +118,17 @@ if (isset($_SESSION["x3login"])) {
     $("#preview").click(function() {
       $('#hidden').hide() ? $('#hidden').show() : $('#hidden').hide();
     });
-    $('#searchs').on('change', function(e) {
-      var sohNum = this.value;
-      //console.log(sohNum);
-      //localStorage.getItem(sohNum) === null
+
+    $('#searchs').bind('keypress', function(e) {
+      if (e.which == 13 || e.originalEvent.clipboardData != null) {
+
+          if (e.originalEvent.clipboardData != null) {
+              var sohNum = e.originalEvent.clipboardData.getData('text');
+          }else {
+              var sohNum = $('#searchs').val();
+          }
+          
+          console.log(sohNum)
       if (localStorage.getItem(sohNum) === null) {
         $.ajax({
           type: "POST",
@@ -133,7 +141,16 @@ if (isset($_SESSION["x3login"])) {
             //localStorage.removeItem('list');
             var rawData = JSON.parse(data);
             var d = rawData.datas;
-
+            var isProblem = false;
+              $.each(d2, function(key, value) {
+                if (value.PRCPQTY != value.SHIQTY) {
+                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
+                  isProblem = true;
+                  return false;
+                }
+              });
+              console.log(isProblem)
+              if (isProblem == false) {$('#save').addClass('disabled')}else{$('#save').removeClass('disabled')}
 
             // Store the object into storage
             //var object = {timestamp: new Date().getTime()}
@@ -145,11 +162,9 @@ if (isset($_SESSION["x3login"])) {
                 if (d.PRCPQTY != d.SHIQTY) {
                   $(row).css("background-color", "red");
                   $(row).css("color", "white");
-                  // $('#save').prop("disabled",true);
                 } else if (d.PRCPQTY == d.SHIQTY) {
                   $(row).css("background-color", "#50c878");
                   $(row).css("color", "white");
-                  //$('#save').prop("disabled",true);
                 }
 
                 $(row).attr("id", 'row-' + d.EANCOD);
@@ -176,7 +191,56 @@ if (isset($_SESSION["x3login"])) {
             });
             $('div.dataTables_filter input', table.table().container()).focus();
             // function
-            //save(d);
+            $("#save").click(function() {
+              var isProblem = false;
+              $.each(d, function(key, value) {
+                if (value.PRCPQTY != value.SHIQTY) {
+                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
+                  isProblem = true;
+                  return false;
+                }
+              });
+              console.log(isProblem)
+              if (isProblem == false) {
+                
+              var sohNum2 = $("#searchs :selected").text();
+              var datass = localStorage.getItem(sohNum2);
+
+              $.ajax({
+                type: "POST",
+                url: 'ReceptionController.php',
+                data: {
+                  user: JSON.parse(datass)
+                },
+                success: function(response) {
+                  console.log(response.replace(/\s/g, ''))
+                  if (response.replace(/\s/g, '') == "1") {
+                    localStorage.removeItem(sohNum2)
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Réception crée avec succes',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'quelque chose s\'est mal passé',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  }
+
+                }
+              });
+            }
+            });
             $('.dataTables_filter input').bind('keypress', function(e) {
               if (e.which == 13 || e.originalEvent.clipboardData != null) {
                 if (e.originalEvent.clipboardData != null) {
@@ -224,7 +288,6 @@ if (isset($_SESSION["x3login"])) {
                       Swal.fire({
                         icon: 'warning',
                         title: 'valeur invalide',
-                        text: 'erreur',
                         showConfirmButton: false,
                         timer: 1900
                       });
@@ -236,8 +299,7 @@ if (isset($_SESSION["x3login"])) {
                 } else {
                   Swal.fire({
                     icon: 'error',
-                    title: 'Erreur',
-                    text: 'Code a bares introuvable',
+                    title: 'Code a bares introuvable',
                     showConfirmButton: false,
                     timer: 1900
                   });
@@ -285,8 +347,65 @@ if (isset($_SESSION["x3login"])) {
             },
           ],
         });
-        //save data in sage
-        save(d2);
+        //create data in sage
+        $("#save").click(function() {
+              var isProblem = false;
+              $.each(d2, function(key, value) {
+                if (value.PRCPQTY != value.SHIQTY) {
+                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
+                  isProblem = true;
+                  return false;
+                }
+              });
+              console.log(isProblem)
+              if (isProblem == false) {
+                
+              var sohNum2 = $("#searchs :selected").text();
+              var datass = localStorage.getItem(sohNum2);
+
+              $.ajax({
+                type: "POST",
+                url: 'ReceptionController.php',
+                data: {
+                  user: JSON.parse(datass)
+                },
+                success: function(response) {
+                  console.log(response.replace(/\s/g, ''))
+                  if (response.replace(/\s/g, '') == "1") {
+                    localStorage.removeItem(sohNum2)
+                    Swal.fire({
+                      icon: 'success',
+                      title: 'Réception crée avec succes',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  } else {
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'quelque chose s\'est mal passé',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+                    sohNum2 = '';
+                    datass = '';
+                    //location.reload();
+                  }
+
+                }
+              });
+            }else{
+              Swal.fire({
+                      icon: 'error',
+                      title: 'les lignes de table sont encore rouges ',
+                      text: '',
+                      showConfirmButton: false,
+                      timer: 2000
+                    });
+            }
+            });
 
         $('div.dataTables_filter input', table.table().container()).focus();
         $('.dataTables_filter input').bind('keypress', function(e) {
@@ -361,61 +480,13 @@ if (isset($_SESSION["x3login"])) {
         // compareTime(dateString, now); //to implement
         // console.log(compareTime(dateString, now))
       }
+    }
     });
+    
 
   });
-  function save(d){
-      //save data in sage
-      $("#save").click(function(d) {
-              var isEquivalent = true;
-              $.each(d, function(key, value) {
-                if (d.PRCPQTY != d.SHIQTY) {
-                  isEquivalent = false;
-                  return false
-                }
-              });
-              if (isEquivalent) {
-              var sohNum2 = $("#searchs :selected").text();
-              var datass = localStorage.getItem(sohNum2);
 
-              $.ajax({
-                type: "POST",
-                url: 'ReceptionController.php',
-                data: {
-                  user: JSON.parse(datass)
-                },
-                success: function(response) {
-                  console.log(response.replace(/\s/g, ''))
-                  if (response.replace(/\s/g, '') == "1") {
-                    localStorage.removeItem(sohNum2)
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Succes',
-                      text: 'Réception crée avec succes',
-                      showConfirmButton: false,
-                      timer: 2000
-                    });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
-                  } else {
-                    Swal.fire({
-                      icon: 'error',
-                      title: 'Succes',
-                      text: 'quelque chose s\'est mal passé',
-                      showConfirmButton: false,
-                      timer: 2000
-                    });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
-                  }
 
-                }
-              });
-            }
-            });
-    }
 </script>
 
 </html>
