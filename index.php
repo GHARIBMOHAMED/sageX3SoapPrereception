@@ -48,7 +48,7 @@ if (isset($_SESSION["x3login"])) {
                 // echo $order->showListe();
                 ?>
               </select> -->
-              <input class="field__input" id="searchs" placeholder="Scanner" value="SHP2208-00000002">
+              <input class="field__input" id="searchs" placeholder="Scanner" value="">
             </div>
           </div>
 
@@ -78,11 +78,6 @@ if (isset($_SESSION["x3login"])) {
                 </svg>
               </button>
               <div class="actions__body">
-                <button class="actions__option js-preview-open" id="preview">
-                  <svg class="icon icon-expand">
-                    <use xlink:href="#icon-expand"></use>
-                  </svg>Afficher
-                </button>
                 <button class="actions__option" id="clear">
                   <svg class="icon icon-close">
                     <use xlink:href="#icon-close"></use>
@@ -104,7 +99,7 @@ if (isset($_SESSION["x3login"])) {
   $(document).ready(function() {
     $('#hidden').hide();
     $('#hidden2').hide();
-
+    $('#searchs').focus();
     var sohNum = '';
     var d = '';
     $("#sold").click(function() {
@@ -115,9 +110,6 @@ if (isset($_SESSION["x3login"])) {
       localStorage.clear();
     });
 
-    $("#preview").click(function() {
-      $('#hidden').hide() ? $('#hidden').show() : $('#hidden').hide();
-    });
 
     $('#searchs').bind('keypress', function(e) {
       if (e.which == 13 || e.originalEvent.clipboardData != null) {
@@ -177,6 +169,7 @@ if (isset($_SESSION["x3login"])) {
                 fnRowCallback: function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                   $(nRow).removeClass('odd');
                   $(nRow).removeClass('even');
+                  $('.dataTables_filter input').addClass('field__input');
                 },
               });
 
@@ -380,6 +373,7 @@ if (isset($_SESSION["x3login"])) {
             fnRowCallback: function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
               $(nRow).removeClass('odd');
               $(nRow).removeClass('even');
+              $('.dataTables_filter input').addClass('field__input');
             },
           });
           //create data in sage
