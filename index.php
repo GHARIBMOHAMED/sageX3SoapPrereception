@@ -48,7 +48,7 @@ if (isset($_SESSION["x3login"])) {
                 // echo $order->showListe();
                 ?>
               </select> -->
-              <input class="field__input" id="searchs"  placeholder="Scanner">
+              <input class="field__input" id="searchs" placeholder="Scanner" value="SHP2208-00000002">
             </div>
           </div>
 
@@ -60,8 +60,8 @@ if (isset($_SESSION["x3login"])) {
               <thead>
                 <tr>
                   <th>Code a bares</th>
-                  <th>Designation</th>
                   <th>Article</th>
+                  <th>Designation</th>
                   <th>quanité</th>
                 </tr>
               </thead>
@@ -105,7 +105,8 @@ if (isset($_SESSION["x3login"])) {
     $('#hidden').hide();
     $('#hidden2').hide();
 
-
+    var sohNum = '';
+    var d = '';
     $("#sold").click(function() {
       //alert( "Handler for .click() called." );
     });
@@ -121,371 +122,447 @@ if (isset($_SESSION["x3login"])) {
     $('#searchs').bind('keypress', function(e) {
       if (e.which == 13 || e.originalEvent.clipboardData != null) {
 
-          if (e.originalEvent.clipboardData != null) {
-              var sohNum = e.originalEvent.clipboardData.getData('text');
-          }else {
-              var sohNum = $('#searchs').val();
-          }
-          
-          console.log(sohNum)
-      if (localStorage.getItem(sohNum) === null) {
-        $.ajax({
-          type: "POST",
-          url: 'indexController.php',
-          data: "userID=" + sohNum,
-          success: function(data) {
-            $('#hidden').show();
-            $('#hidden2').show();
+        if (e.originalEvent.clipboardData != null) {
+          var sohNum = e.originalEvent.clipboardData.getData('text');
+        } else {
+          var sohNum = $('#searchs').val();
+        }
 
-            //localStorage.removeItem('list');
-            var rawData = JSON.parse(data);
-            var d = rawData.datas;
-            var isProblem = false;
-              $.each(d2, function(key, value) {
-                if (value.PRCPQTY != value.SHIQTY) {
-                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
-                  isProblem = true;
-                  return false;
-                }
+        if (localStorage.getItem(sohNum) === null) {
+          $.ajax({
+            type: "POST",
+            url: 'indexController.php',
+            data: "userID=" + sohNum,
+            success: function(data) {
+              $('#hidden').show();
+              $('#hidden2').show();
+
+              //localStorage.removeItem('list');
+              var rawData = JSON.parse(data);
+              var d = rawData.datas;
+
+              localStorage.setItem(rawData[0].SHIPNUM, JSON.stringify(d));
+              isNoProblem();
+
+              var table = $('#example').DataTable({
+                createdRow: function(row, d, dataIndex) {
+                  if (d.PRCPQTY != d.SHIQTY) {
+                    $(row).css("background-color", "red");
+                    $(row).css("color", "white");
+                  } else if (d.PRCPQTY == d.SHIQTY) {
+                    $(row).css("background-color", "#50c878");
+                    $(row).css("color", "white");
+                  }
+                  $(row).attr("id", 'row-' + d.EANCOD);
+                },
+                data: d,
+                responsive: true,
+                destroy: true,
+                pageLength: 500,
+                bPaginate: false,
+                columns: [{
+                    data: "EANCOD",
+                    name: "code bares"
+                  },
+                  {
+                    data: "ITMREF",
+                  },
+                  {
+                    data: "ITMDES",
+                  },
+                  {
+                    data: "PRCPQTY",
+                  },
+                ],
+                fnRowCallback: function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                  $(nRow).removeClass('odd');
+                  $(nRow).removeClass('even');
+                },
               });
-              console.log(isProblem)
-              if (isProblem == false) {$('#save').addClass('disabled')}else{$('#save').removeClass('disabled')}
 
-            // Store the object into storage
-            //var object = {timestamp: new Date().getTime()}
-            // all = d.concat(object)
-            localStorage.setItem(rawData[0].SHIPNUM, JSON.stringify(d));
+              $('div.dataTables_filter input', table.table().container()).focus();
 
-            var table = $('#example').DataTable({
-              createdRow: function(row, d, dataIndex) {
-                if (d.PRCPQTY != d.SHIQTY) {
-                  $(row).css("background-color", "red");
-                  $(row).css("color", "white");
-                } else if (d.PRCPQTY == d.SHIQTY) {
-                  $(row).css("background-color", "#50c878");
-                  $(row).css("color", "white");
-                }
+              $("#save").click(function() {
 
-                $(row).attr("id", 'row-' + d.EANCOD);
-              },
-              data: d,
-              responsive: true,
-              destroy: true,
-              pageLength: 500,
-              bPaginate: false,
-              columns: [{
-                  data: "EANCOD",
-                  name: "code bares"
-                },
-                {
-                  data: "ITMREF",
-                },
-                {
-                  data: "ITMDES",
-                },
-                {
-                  data: "PRCPQTY",
-                },
-              ]
-            });
-            $('div.dataTables_filter input', table.table().container()).focus();
-            // function
-            $("#save").click(function() {
-              var isProblem = false;
-              $.each(d, function(key, value) {
-                if (value.PRCPQTY != value.SHIQTY) {
-                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
-                  isProblem = true;
-                  return false;
-                }
+                var sohNum2 = $("#searchs").val();
+                var datass = localStorage.getItem(sohNum2);
+
+                $.ajax({
+                  type: "POST",
+                  url: 'ReceptionController.php',
+                  data: {
+                    user: JSON.parse(datass)
+                  },
+                  success: function(response) {
+                    console.log(response.replace(/\s/g, ''))
+                    if (response.replace(/\s/g, '') == "1") {
+                      localStorage.removeItem(sohNum2)
+                      Swal.fire({
+                        icon: 'success',
+                        title: 'Réception crée avec succes',
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      sohNum2 = '';
+                      datass = '';
+                      //location.reload();
+                    } else {
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'quelque chose s\'est mal passé',
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      sohNum2 = '';
+                      datass = '';
+                      //location.reload();
+                    }
+
+                  }
+                });
               });
-              console.log(isProblem)
-              if (isProblem == false) {
-                
-              var sohNum2 = $("#searchs :selected").text();
-              var datass = localStorage.getItem(sohNum2);
-
-              $.ajax({
-                type: "POST",
-                url: 'ReceptionController.php',
-                data: {
-                  user: JSON.parse(datass)
-                },
-                success: function(response) {
-                  console.log(response.replace(/\s/g, ''))
-                  if (response.replace(/\s/g, '') == "1") {
-                    localStorage.removeItem(sohNum2)
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Réception crée avec succes',
-                      showConfirmButton: false,
-                      timer: 2000
+              $('.dataTables_filter input').bind('keypress', function(e) {
+                if (e.which == 13 || e.originalEvent.clipboardData != null) {
+                  if (e.originalEvent.clipboardData != null) {
+                    var pastedData = e.originalEvent.clipboardData.getData('text').toUpperCase();
+                  } else {
+                    var pastedData = $('.dataTables_filter input').val().toUpperCase();
+                  }
+                  var row = table.row('#row-' + pastedData).data();
+                  var filteredData = table.column(0).data()
+                    .filter(function(value, index) {
+                      return value == pastedData ? true : false;
                     });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
+
+                  var row2 = table.row('.row-' + pastedData).data();
+                  var filteredData2 = table.column(1).data()
+                    .filter(function(value, index) {
+                      return value == pastedData ? true : false;
+                    });
+
+                  if (filteredData.length == 1) {
+
+                    var filteredDataquantite = row;
+                    var codeBar = row[0];
+                    var quantite;
+                    Swal.fire({
+                      text: 'Combien d\'article vous trouvez ?',
+                      input: 'number',
+                    }).then((result) => {
+
+                      if (result.value != '' && result.value.length != 13) {
+                        quantite = result.value
+                      } else {
+                        quantite = 'erorr';
+                      }
+                      if (result.isConfirmed && quantite != 'erorr') {
+
+                        //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+                        $.each(d, function(key, value) {
+                          if (d[key].EANCOD == pastedData) {
+                            d[key].PRCPQTY = quantite;
+                            table.search('').draw();
+                            localStorage.removeItem(sohNum);
+                            localStorage.setItem(sohNum, JSON.stringify(d));
+                            table.clear().rows.add(d).draw();
+                            table.search('').draw();
+                            $('div.dataTables_filter input', table.table().container()).focus();
+                          }
+                        });
+
+                        isNoProblem();
+
+                      } else {
+                        Swal.fire({
+                          icon: 'warning',
+                          title: 'valeur invalide',
+                          showConfirmButton: false,
+                          timer: 1900
+                        });
+                        table.search('').draw();
+                      }
+
+                    });
+
+                  } else if (filteredData2.length == 1) {
+                    
+                    var quantite;
+                    Swal.fire({
+                      text: 'Combien d\'article vous trouvez ?',
+                      input: 'number',
+                    }).then((result) => {
+
+                      if (result.value != '' && result.value.length != 13) {
+                        quantite = result.value
+                      } else {
+                        quantite = 'erorr';
+                      }
+                      if (result.isConfirmed && quantite != 'erorr') {
+                        //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+                        $.each(d, function(key, value) {
+                          if (d[key].ITMREF == pastedData) {
+                            d[key].PRCPQTY = quantite;
+                            //update localstorage
+                            localStorage.removeItem(sohNum);
+                            localStorage.setItem(sohNum, JSON.stringify(d));
+                            table.clear().rows.add(d).draw();
+                            table.search('').draw();
+                            $('div.dataTables_filter input', table.table().container()).focus();
+                          }
+                        });
+                        isNoProblem();
+
+                      } else {
+                        Swal.fire({
+                          icon: 'warning',
+                          title: 'valeur invalide',
+                          text: 'erreur',
+                          showConfirmButton: false,
+                          timer: 1900
+                        });
+                        table.search('').draw();
+                      }
+
+                    });
+
                   } else {
                     Swal.fire({
                       icon: 'error',
-                      title: 'quelque chose s\'est mal passé',
+                      title: 'Code a bares introuvable',
                       showConfirmButton: false,
-                      timer: 2000
+                      timer: 1900
                     });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
+                    table.search('').draw();
                   }
-
                 }
               });
             }
-            });
-            $('.dataTables_filter input').bind('keypress', function(e) {
-              if (e.which == 13 || e.originalEvent.clipboardData != null) {
-                if (e.originalEvent.clipboardData != null) {
-                  var pastedData = e.originalEvent.clipboardData.getData('text').toUpperCase();
-                } else {
-                  var pastedData = $('.dataTables_filter input').val().toUpperCase();
-                }
-                var row = table.row('#row-' + pastedData).data();
-                var filteredData = table.column(0).data()
-                  .filter(function(value, index) {
-                    return value == pastedData ? true : false;
-                  });
+          });
+        } else {
 
-                if (filteredData.length == 1) {
+          isNoProblem();
+          $('#hidden').show();
+          $('#hidden2').show();
+          var d2 = JSON.parse(localStorage.getItem(sohNum));
+          //console.log(d2)
 
-                  var filteredDataquantite = row;
-                  var codeBar = row[0];
-                  var quantite;
+          var table = $('#example').DataTable({
+            createdRow: function(row, d2, dataIndex) {
+              if (d2.PRCPQTY != d2.SHIQTY) {
+                $(row).css("background-color", "red");
+                $(row).css("color", "white");
+              } else if (d2.PRCPQTY == d2.SHIQTY) {
+                $(row).css("background-color", "#50c878");
+                $(row).css("color", "white");
+              }
+              $(row).attr("class", 'row-' + d2.ITMREF);
+              $(row).attr("id", 'row-' + d2.EANCOD);
+            },
+            data: d2,
+            responsive: true,
+            destroy: true,
+            pageLength: 500,
+            bPaginate: false,
+            columns: [{
+                data: "EANCOD",
+                name: "code bares"
+              },
+              {
+                data: "ITMREF",
+              },
+              {
+                data: "ITMDES",
+              },
+              {
+                data: "PRCPQTY",
+              },
+            ],
+            fnRowCallback: function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+              $(nRow).removeClass('odd');
+              $(nRow).removeClass('even');
+            },
+          });
+          //create data in sage
+          $("#save").click(function() {
+            var sohNum2 = $("#searchs").val();
+            var datass = localStorage.getItem(sohNum2);
+
+            $.ajax({
+              type: "POST",
+              url: 'ReceptionController.php',
+              data: {
+                user: JSON.parse(datass)
+              },
+              success: function(response) {
+                console.log(response.replace(/\s/g, ''))
+                if (response.replace(/\s/g, '') == "1") {
+                  localStorage.removeItem(sohNum2)
                   Swal.fire({
-                    text: 'Combien d\'article vous trouvez ?',
-                    input: 'number',
-                  }).then((result) => {
-
-                    if (result.value != '' && result.value.length != 13) {
-                      quantite = result.value
-                    } else {
-                      quantite = 'erorr';
-                    }
-                    if (result.isConfirmed && quantite != 'erorr') {
-
-                      //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
-                      $.each(d, function(key, value) {
-                        if (d[key].EANCOD == pastedData) {
-                          d[key].PRCPQTY = quantite;
-                          table.search('').draw();
-                          localStorage.removeItem(sohNum);
-                          localStorage.setItem(sohNum, JSON.stringify(d));
-                          table.clear().rows.add(d).draw();
-                          table.search('').draw();
-                          $('div.dataTables_filter input', table.table().container()).focus();
-                        }
-                      });
-
-                    } else {
-                      Swal.fire({
-                        icon: 'warning',
-                        title: 'valeur invalide',
-                        showConfirmButton: false,
-                        timer: 1900
-                      });
-                      table.search('').draw();
-                    }
-
+                    icon: 'success',
+                    title: 'Réception crée avec succes',
+                    showConfirmButton: false,
+                    timer: 2000
                   });
-
+                  sohNum2 = '';
+                  datass = '';
+                  //location.reload();
                 } else {
                   Swal.fire({
                     icon: 'error',
-                    title: 'Code a bares introuvable',
+                    title: 'quelque chose s\'est mal passé',
                     showConfirmButton: false,
-                    timer: 1900
+                    timer: 2000
                   });
-                  table.search('').draw();
+                  sohNum2 = '';
+                  datass = '';
+                  //location.reload();
                 }
               }
             });
-          }
-        });
-      } else {
-        $('#hidden').show();
-        $('#hidden2').show();
-        var d2 = JSON.parse(localStorage.getItem(sohNum));
-        //console.log(d2)
+          });
 
-        var table = $('#example').DataTable({
-          createdRow: function(row, d2, dataIndex) {
-            if (d2.PRCPQTY != d2.SHIQTY) {
-              $(row).css("background-color", "red");
-              $(row).css("color", "white");
-            } else if (d2.PRCPQTY == d2.SHIQTY) {
-              $(row).css("background-color", "#50c878");
-              $(row).css("color", "white");
-            }
+          $('div.dataTables_filter input', table.table().container()).focus();
+          $('.dataTables_filter input').bind('keypress', function(e) {
+            if (e.which == 13 || e.originalEvent.clipboardData != null) {
+              if (e.originalEvent.clipboardData != null) {
+                var pastedData = e.originalEvent.clipboardData.getData('text').toUpperCase();
+              } else {
+                var pastedData = $('.dataTables_filter input').val().toUpperCase();
+              }
+              var row = table.row('#row-' + pastedData).data();
+              var filteredData = table.column(0).data()
+                .filter(function(value, index) {
+                  return value == pastedData ? true : false;
+                });
 
-            $(row).attr("id", 'row-' + d2.EANCOD);
-          },
-          data: d2,
-          responsive: true,
-          destroy: true,
-          pageLength: 500,
-          bPaginate: false,
-          columns: [{
-              data: "EANCOD",
-              name: "code bares"
-            },
-            {
-              data: "ITMREF",
-            },
-            {
-              data: "ITMDES",
-            },
-            {
-              data: "PRCPQTY",
-            },
-          ],
-        });
-        //create data in sage
-        $("#save").click(function() {
-              var isProblem = false;
-              $.each(d2, function(key, value) {
-                if (value.PRCPQTY != value.SHIQTY) {
-                  console.log(value.PRCPQTY + '  ' +value.SHIQTY);
-                  isProblem = true;
-                  return false;
-                }
-              });
-              console.log(isProblem)
-              if (isProblem == false) {
-                
-              var sohNum2 = $("#searchs :selected").text();
-              var datass = localStorage.getItem(sohNum2);
+              var row2 = table.row('.row-' + pastedData).data();
+              var filteredData2 = table.column(1).data()
+                .filter(function(value, index) {
+                  return value == pastedData ? true : false;
+                });
 
-              $.ajax({
-                type: "POST",
-                url: 'ReceptionController.php',
-                data: {
-                  user: JSON.parse(datass)
-                },
-                success: function(response) {
-                  console.log(response.replace(/\s/g, ''))
-                  if (response.replace(/\s/g, '') == "1") {
-                    localStorage.removeItem(sohNum2)
-                    Swal.fire({
-                      icon: 'success',
-                      title: 'Réception crée avec succes',
-                      showConfirmButton: false,
-                      timer: 2000
+              if (filteredData.length == 1) {
+
+                var filteredDataquantite = row;
+                var codeBar = row[0];
+                var quantite;
+                Swal.fire({
+                  text: 'Combien d\'article vous trouvez ?',
+                  input: 'number',
+                }).then((result) => {
+
+                  if (result.value != '' && result.value.length != 13) {
+                    quantite = result.value
+                  } else {
+                    quantite = 'erorr';
+                  }
+                  if (result.isConfirmed && quantite != 'erorr') {
+                    //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+                    $.each(d2, function(key, value) {
+                      if (d2[key].EANCOD == pastedData) {
+                        d2[key].PRCPQTY = quantite;
+                        //update localstorage
+                        localStorage.removeItem(sohNum);
+                        localStorage.setItem(sohNum, JSON.stringify(d2));
+                        table.clear().rows.add(d2).draw();
+                        table.search('').draw();
+                        $('div.dataTables_filter input', table.table().container()).focus();
+                      }
                     });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
+                    isNoProblem();
+
                   } else {
                     Swal.fire({
-                      icon: 'error',
-                      title: 'quelque chose s\'est mal passé',
+                      icon: 'warning',
+                      title: 'valeur invalide',
+                      text: 'erreur',
                       showConfirmButton: false,
-                      timer: 2000
+                      timer: 1900
                     });
-                    sohNum2 = '';
-                    datass = '';
-                    //location.reload();
+                    table.search('').draw();
                   }
 
-                }
-              });
-            }else{
-              Swal.fire({
-                      icon: 'error',
-                      title: 'les lignes de table sont encore rouges ',
-                      text: '',
-                      showConfirmButton: false,
-                      timer: 2000
+                });
+
+              } else if (filteredData2.length == 1) {
+                console.log("here")
+                var quantite;
+                Swal.fire({
+                  text: 'Combien d\'article vous trouvez ?',
+                  input: 'number',
+                }).then((result) => {
+
+                  if (result.value != '' && result.value.length != 13) {
+                    quantite = result.value
+                  } else {
+                    quantite = 'erorr';
+                  }
+                  if (result.isConfirmed && quantite != 'erorr') {
+                    //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
+                    $.each(d2, function(key, value) {
+                      if (d2[key].ITMREF == pastedData) {
+                        d2[key].PRCPQTY = quantite;
+                        //update localstorage
+                        localStorage.removeItem(sohNum);
+                        localStorage.setItem(sohNum, JSON.stringify(d2));
+                        table.clear().rows.add(d2).draw();
+                        table.search('').draw();
+                        $('div.dataTables_filter input', table.table().container()).focus();
+                      }
                     });
+                    isNoProblem();
+
+                  } else {
+                    Swal.fire({
+                      icon: 'warning',
+                      title: 'valeur invalide',
+                      text: 'erreur',
+                      showConfirmButton: false,
+                      timer: 1900
+                    });
+                    table.search('').draw();
+                  }
+
+                });
+
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Erreur',
+                  text: 'Code a bares introuvable',
+                  showConfirmButton: false,
+                  timer: 1900
+                });
+                table.search('').draw();
+              }
             }
-            });
+          });
+          // dateString = d2.timestamp,
+          // now = new Date().getTime().toString();
+          // compareTime(dateString, now); //to implement
+          // console.log(compareTime(dateString, now))
+        }
+      }
 
-        $('div.dataTables_filter input', table.table().container()).focus();
-        $('.dataTables_filter input').bind('keypress', function(e) {
-          if (e.which == 13 || e.originalEvent.clipboardData != null) {
-            if (e.originalEvent.clipboardData != null) {
-              var pastedData = e.originalEvent.clipboardData.getData('text').toUpperCase();
-            } else {
-              var pastedData = $('.dataTables_filter input').val().toUpperCase();
-            }
-            var row = table.row('#row-' + pastedData).data();
-            var filteredData = table.column(0).data()
-              .filter(function(value, index) {
-                return value == pastedData ? true : false;
-              });
-
-            if (filteredData.length == 1) {
-
-              var filteredDataquantite = row;
-              var codeBar = row[0];
-              var quantite;
-              Swal.fire({
-                text: 'Combien d\'article vous trouvez ?',
-                input: 'number',
-              }).then((result) => {
-
-                if (result.value != '' && result.value.length != 13) {
-                  quantite = result.value
-                } else {
-                  quantite = 'erorr';
-                }
-                if (result.isConfirmed && quantite != 'erorr') {
-                  //modifier le JSON d si le code scanner existe dans le table apres comparez le code a bares
-                  $.each(d2, function(key, value) {
-                    if (d2[key].EANCOD == pastedData) {
-                      d2[key].PRCPQTY = quantite;
-                      //update localstorage
-                      localStorage.removeItem(sohNum);
-                      localStorage.setItem(sohNum, JSON.stringify(d2));
-                      table.clear().rows.add(d2).draw();
-                      table.search('').draw();
-                      $('div.dataTables_filter input', table.table().container()).focus();
-                    }
-                  });
-
-                } else {
-                  Swal.fire({
-                    icon: 'warning',
-                    title: 'valeur invalide',
-                    text: 'erreur',
-                    showConfirmButton: false,
-                    timer: 1900
-                  });
-                  table.search('').draw();
-                }
-
-              });
-
-            } else {
-              Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                text: 'Code a bares introuvable',
-                showConfirmButton: false,
-                timer: 1900
-              });
-              table.search('').draw();
-            }
+      function isNoProblem() {
+        var data = JSON.parse(localStorage.getItem(sohNum));
+        var isProblem = false;
+        $.each(data, function(key, value) {
+          if (value.PRCPQTY != value.SHIQTY) {
+            console.log(value.PRCPQTY + '  ' + value.SHIQTY);
+            isProblem = true;
+            $('#save').addClass('disabled')
+            return false;
+          } else {
+            $('#save').removeClass('disabled')
           }
         });
-        // dateString = d2.timestamp,
-        // now = new Date().getTime().toString();
-        // compareTime(dateString, now); //to implement
-        // console.log(compareTime(dateString, now))
+        return isProblem;
       }
-    }
     });
-    
+
 
   });
-
-
 </script>
 
 </html>

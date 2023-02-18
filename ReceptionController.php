@@ -2,8 +2,8 @@
 <?php
 require_once('WebService/models/Reception.php');
 $data = $_POST["user"];
+
 if(isset($_POST["user"]) && !empty($_POST["user"])){
-    
     $site = $data[0]["POHFCY"];
     $fournisseur = $data[0]["BPSNUM"];
     $CUR = $data[0]["NETCUR"];
@@ -40,6 +40,7 @@ if(isset($_POST["user"]) && !empty($_POST["user"])){
         }else{
             return print_r(json_encode(0)) ;
         }
+
     } catch (SoapFault $e) {
         
         return print_r(json_encode(2)) ;
