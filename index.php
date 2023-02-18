@@ -119,7 +119,8 @@ if (isset($_SESSION["x3login"])) {
         } else {
           var sohNum = $('#searchs').val();
         }
-
+        $(this).prop("disabled",true);
+        
         if (localStorage.getItem(sohNum) === null) {
           $.ajax({
             type: "POST",
@@ -198,7 +199,8 @@ if (isset($_SESSION["x3login"])) {
                       });
                       sohNum2 = '';
                       datass = '';
-                      //location.reload();
+                      location.reload();
+                      
                     } else {
                       Swal.fire({
                         icon: 'error',
@@ -399,7 +401,7 @@ if (isset($_SESSION["x3login"])) {
                   });
                   sohNum2 = '';
                   datass = '';
-                  //location.reload();
+                  location.reload();
                 } else {
                   Swal.fire({
                     icon: 'error',
