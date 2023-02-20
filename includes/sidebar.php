@@ -1,3 +1,8 @@
+<style>
+  a.sidebar__item {
+    text-decoration: none;
+}
+</style>
 <div class="sidebar">
   <button class="sidebar__close">
     <svg class="icon icon-close">
@@ -10,12 +15,17 @@
     <a class="sidebar__item" href="index.php">
       <svg class="icon icon-home">
         <use xlink:href="#icon-home"></use>
-      </svg>Home
+      </svg>Créer une Réception
+    </a>
+    <a class="sidebar__item" href="livraison.php">
+      <svg class="icon icon-home">
+        <use xlink:href="#icon-shopping-bag"></use>
+      </svg>Crée une Livraison
     </a>
     <a class="sidebar__item" href="sign-in.php">
       <svg class="icon icon-bar-chart">
         <use xlink:href="#icon-profile-circle"></use>
-      </svg>Sign in
+      </svg>Se Connecter
     </a>
   </div>
 

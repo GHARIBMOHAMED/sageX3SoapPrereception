@@ -36,18 +36,10 @@ if (isset($_SESSION["x3login"])) {
         </div>
         <div class="create__card card">
           <div class="card__head">
-            <div class="title-purple card__title">Réreception.</div>
+            <div class="title-green card__title">Livraison</div>
           </div>
           <div class="field">
             <div class="field__wrap">
-              <!-- <select class="select" id="searchs" name="formsohnum">
-                <option>Selectionez préreception</option>
-                <?php
-                // require_once('WebService/models/PreCommand.php');
-                // $order = new PreCommande();
-                // echo $order->showListe();
-                ?>
-              </select> -->
               <input class="field__input" id="searchs" placeholder="Scanner le code" value="">
             </div>
           </div>
@@ -62,7 +54,7 @@ if (isset($_SESSION["x3login"])) {
                   <th>Code a bares</th>
                   <th>Article</th>
                   <th>Designation</th>
-                  <th>quanité</th>
+                  <th>Quanité</th>
                 </tr>
               </thead>
             </table>
@@ -124,8 +116,8 @@ if (isset($_SESSION["x3login"])) {
         if (localStorage.getItem(sohNum) === null) {
           $.ajax({
             type: "POST",
-            url: 'indexController.php',
-            data: "userID=" + sohNum,
+            url: 'livraisonController.php',
+            data:{ userID:sohNum,show:"1"},
             success: function(data) {
               $('#hidden').show();
               $('#hidden2').show();
@@ -134,15 +126,15 @@ if (isset($_SESSION["x3login"])) {
               var rawData = JSON.parse(data);
               var d = rawData.datas;
 
-              localStorage.setItem(rawData[0].SHIPNUM, JSON.stringify(d));
+              localStorage.setItem(rawData[0].SOHNUM, JSON.stringify(d));
               isNoProblem();
 
               var table = $('#example').DataTable({
                 createdRow: function(row, d, dataIndex) {
-                  if (d.PRCPQTY != d.SHIQTY) {
+                  if (d.QTY != d.PRCPQTY) {
                     $(row).css("background-color", "red");
                     $(row).css("color", "white");
-                  } else if (d.PRCPQTY == d.SHIQTY) {
+                  } else if (d.QTY == d.PRCPQTY) {
                     $(row).css("background-color", "#50c878");
                     $(row).css("color", "white");
                   }
@@ -161,7 +153,7 @@ if (isset($_SESSION["x3login"])) {
                     data: "ITMREF",
                   },
                   {
-                    data: "ITMDES",
+                    data: "ITMDES1",
                   },
                   {
                     data: "PRCPQTY",
@@ -183,12 +175,13 @@ if (isset($_SESSION["x3login"])) {
 
                 $.ajax({
                   type: "POST",
-                  url: 'ReceptionController.php',
+                  url: 'livraisonController.php',
                   data: {
-                    user: JSON.parse(datass)
+                    user: JSON.parse(datass),
+                    func:"save"
                   },
                   success: function(response) {
-                    console.log(response.replace(/\s/g, ''))
+                    console.log(response)
                     if (response.replace(/\s/g, '') == "1") {
                       localStorage.removeItem(sohNum2)
                       Swal.fire({
@@ -199,7 +192,7 @@ if (isset($_SESSION["x3login"])) {
                       });
                       sohNum2 = '';
                       datass = '';
-                      location.reload();
+                      //location.reload();
                       
                     } else {
                       Swal.fire({
@@ -339,14 +332,13 @@ if (isset($_SESSION["x3login"])) {
           $('#hidden').show();
           $('#hidden2').show();
           var d2 = JSON.parse(localStorage.getItem(sohNum));
-          //console.log(d2)
 
           var table = $('#example').DataTable({
             createdRow: function(row, d2, dataIndex) {
-              if (d2.PRCPQTY != d2.SHIQTY) {
+              if (d2.QTY != d2.PRCPQTY) {
                 $(row).css("background-color", "red");
                 $(row).css("color", "white");
-              } else if (d2.PRCPQTY == d2.SHIQTY) {
+              } else if (d2.QTY == d2.PRCPQTY) {
                 $(row).css("background-color", "#50c878");
                 $(row).css("color", "white");
               }
@@ -366,7 +358,7 @@ if (isset($_SESSION["x3login"])) {
                 data: "ITMREF",
               },
               {
-                data: "ITMDES",
+                data: "ITMDES1",
               },
               {
                 data: "PRCPQTY",
@@ -385,12 +377,13 @@ if (isset($_SESSION["x3login"])) {
 
             $.ajax({
               type: "POST",
-              url: 'ReceptionController.php',
+              url: 'livraisonController.php',
               data: {
-                user: JSON.parse(datass)
+                user: JSON.parse(datass),
+                func:"save"
               },
               success: function(response) {
-                console.log(response.replace(/\s/g, ''))
+               console.log(response);
                 if (response.replace(/\s/g, '') == "1") {
                   localStorage.removeItem(sohNum2)
                   Swal.fire({
@@ -481,7 +474,7 @@ if (isset($_SESSION["x3login"])) {
                 });
 
               } else if (filteredData2.length == 1) {
-                console.log("here")
+              
                 var quantite;
                 Swal.fire({
                   text: 'Combien d\'article vous trouvez ?',
@@ -535,8 +528,7 @@ if (isset($_SESSION["x3login"])) {
           });
           // dateString = d2.timestamp,
           // now = new Date().getTime().toString();
-          // compareTime(dateString, now); //to implement
-          // console.log(compareTime(dateString, now))
+          // compareTime(dateString, now); //to implement 
         }
       }
 
@@ -544,8 +536,7 @@ if (isset($_SESSION["x3login"])) {
         var data = JSON.parse(localStorage.getItem(sohNum));
         var isProblem = false;
         $.each(data, function(key, value) {
-          if (value.PRCPQTY != value.SHIQTY) {
-            console.log(value.PRCPQTY + '  ' + value.SHIQTY);
+          if (value.QTY != value.PRCPQTY) {
             isProblem = true;
             $('#save').addClass('disabled')
             return false;
