@@ -20,7 +20,12 @@
     <a class="sidebar__item" href="livraison.php">
       <svg class="icon icon-home">
         <use xlink:href="#icon-shopping-bag"></use>
-      </svg>Crée une Livraison
+      </svg>Créer une Livraison
+    </a>
+    <a class="sidebar__item" href="inventaire.php">
+      <svg class="icon icon-home">
+        <use xlink:href="#icon-schedule"></use>
+      </svg>Compter Inventaire
     </a>
     <a class="sidebar__item" href="sign-in.php">
       <svg class="icon icon-bar-chart">

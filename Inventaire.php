@@ -36,16 +36,19 @@ if (isset($_SESSION["x3login"])) {
         </div>
         <div class="create__card card">
           <div class="card__head">
-            <div class="title-purple card__title">Réreception.</div>
+            <div class="title-red card__title">Inventaire.</div>
           </div>
           <div class="field">
             <div class="field__wrap">
-              
-              <input class="form__input" type="text" id="searchs" placeholder="Scanner le code" required="true" autocomplete="off"/>
-                <button class="form__button">
-                 <img src="img/barcode-icon.jpg" class="icon icon-search" alt="">
-                </button>
-          
+              <select class="select" id="searchs" name="formsohnum">
+                <option>Selectionez Inventaire</option>
+                <?php
+                require_once('WebService/models/Inventaire.php');
+                $Inventaire = new Inventaire();
+                echo $Inventaire->showListe();
+                ?>
+              </select>
+              <!-- <input class="field__input" id="searchs" placeholder="Scanner le code" value=""> -->
             </div>
           </div>
 

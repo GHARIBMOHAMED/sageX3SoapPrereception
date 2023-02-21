@@ -31,16 +31,16 @@ if (isset($_SESSION["x3login"])) {
     <!-- inner-->
     <div class="page__inner">
       <div class="page__container">
-        <div class="page__title h3">
-          <div id="numexpidition"></div>
-        </div>
-        <div class="create__card card">
+        <div class="customer__card card">
           <div class="card__head">
             <div class="title-green card__title">Livraison</div>
           </div>
           <div class="field">
             <div class="field__wrap">
-              <input class="field__input" id="searchs" placeholder="Scanner le code" value="">
+            <input class="form__input" type="text" id="searchs" placeholder="Scanner le code" required="true" />
+                <button class="form__button">
+                 <img src="img/barcode-icon.jpg" class="icon icon-search" alt="">
+                </button>
             </div>
           </div>
 
