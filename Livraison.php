@@ -192,7 +192,7 @@ if (isset($_SESSION["x3login"])) {
                       });
                       sohNum2 = '';
                       datass = '';
-                      //location.reload();
+                      location.reload();
                       
                     } else {
                       Swal.fire({
