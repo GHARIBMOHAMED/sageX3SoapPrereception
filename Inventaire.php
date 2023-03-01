@@ -289,7 +289,7 @@ if (isset($_SESSION["x3login"])) {
                     var codeBar = row[0];
                     var quantite;
                     Swal.fire({
-                      text: 'Combien d\'article vous trouvez ?',
+                      text: 'combien de produits avez-vous trouvé ?',
                       input: 'number',
                     }).then((result) => {
 
@@ -333,7 +333,7 @@ if (isset($_SESSION["x3login"])) {
                     
                     var quantite;
                     Swal.fire({
-                      text: 'Combien d\'article vous trouvez ?',
+                      text: 'combien de produits avez-vous trouvé ?',
                       input: 'number',
                     }).then((result) => {
 
@@ -434,43 +434,55 @@ if (isset($_SESSION["x3login"])) {
           });
           //create data in sage
           $("#save").click(function() {
-            var sohNum2 = $("#searchs").val();
-            var datass = localStorage.getItem(sohNum2);
-            console.log(sohNum2)
-            $.ajax({
-              type: "POST",
-              url: 'InventaireController.php',
-              data: {
-                user: datass,
-                func:"update",
-                user2:sohNum2
-              },
-              success: function(response) {
-                console.log(response)
-                if (response.replace(/\s/g, '') == "1") {
-                  localStorage.removeItem(sohNum2)
-                  Swal.fire({
-                    icon: 'success',
-                    title: 'Réception crée avec succes',
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  sohNum2 = '';
-                  datass = '';
-                  location.reload();
-                } else {
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'quelque chose s\'est mal passé',
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-                  sohNum2 = '';
-                  datass = '';
-                  //location.reload();
-                }
+            Swal.fire({
+              title: 'Voulez-vous sauvegarder les modifications ?',
+              showDenyButton: true,
+              showCancelButton: true,
+              confirmButtonText: 'Sauvegarder',
+            }).then((result) => {
+              if (result.isConfirmed) {
+                var sohNum2 = $("#searchs").val();
+                var datass = localStorage.getItem(sohNum2);
+                console.log(sohNum2)
+                $.ajax({
+                  type: "POST",
+                  url: 'InventaireController.php',
+                  data: {
+                    user: datass,
+                    func:"update",
+                    user2:sohNum2
+                  },
+                  success: function(response) {
+                    console.log(response)
+                    if (response.replace(/\s/g, '') == "1") {
+                      localStorage.removeItem(sohNum2)
+                      Swal.fire({
+                        icon: 'success',
+                        title: 'Inventaire crée avec succes',
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      sohNum2 = '';
+                      datass = '';
+                      location.reload();
+                    } else {
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'quelque chose n\'a pas fonctionné',
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
+                      sohNum2 = '';
+                      datass = '';
+                      //location.reload();
+                    }
+                  }
+                });
+              } else if (result.isDenied) {
+                
               }
-            });
+            })
+           
           });
 
           $('div.dataTables_filter input', table.table().container()).focus();
@@ -499,7 +511,7 @@ if (isset($_SESSION["x3login"])) {
                 var codeBar = row[0];
                 var quantite;
                 Swal.fire({
-                  text: 'Combien d\'article vous trouvez ?',
+                  text: 'combien de produits avez-vous trouvé ?',
                   input: 'number',
                 }).then((result) => {
 
@@ -541,7 +553,7 @@ if (isset($_SESSION["x3login"])) {
                 console.log("here")
                 var quantite;
                 Swal.fire({
-                  text: 'Combien d\'article vous trouvez ?',
+                  text: 'combien de produits avez-vous trouvé ?',
                   input: 'number',
                 }).then((result) => {
 
@@ -598,21 +610,47 @@ if (isset($_SESSION["x3login"])) {
       function isNoProblem() {
         var data = JSON.parse(localStorage.getItem(sohNum));
         var isProblem = false;
-        $.each(data, function(key, value) {
-          if (value.QTYSTUNEW == 0) {
+        
+        //   if (value.QTYSTUNEW == 0) {
 
-            isProblem = true;
-            $('#save').addClass('disabled')
-            return false;
-          } else {
-            $('#save').removeClass('disabled')
-          }
-        });
-        return isProblem;
+        //     isProblem = true;
+        //     $('#save').addClass('disabled')
+        //     return false;
+        //   } else {
+        //     $('#save').removeClass('disabled')
+        //   }
+        
+        // return isProblem;
       }
     });
 
+    window.addEventListener("load", () => {
+                function handleNetworkChange(event) {
+                    if (navigator.onLine) {
+                      $('#save').removeClass('disabled')
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'vous êtes en ligne',
+                            text: 'vous êtes en ligne',
+                            showConfirmButton: false,
+                            timer: 900
+                            });
+                            
 
+                    }else{
+                      $('#save').addClass('disabled')
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'vous êtes hors-ligne',
+                            text: 'vous êtes hors-ligne',
+                            showConfirmButton: false,
+                            timer: 2000
+                            });
+                    }
+                }
+                window.addEventListener("online", handleNetworkChange);
+                window.addEventListener("offline", handleNetworkChange);
+            });
   });
 </script>
 
