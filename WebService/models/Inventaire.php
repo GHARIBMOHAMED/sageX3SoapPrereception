@@ -3,7 +3,7 @@ require_once ('WebService/modelWS/ModelX3.php');
 class Inventaire extends ModelX3 {
     
 	function showOne($CUNLISNUM,$CUNSSSNUM) {
-		$WS_ORDER = "RINVV";
+		$WS_ORDER = "RINV";
 		$cle = new CAdxParamKeyValue ();
 		$cle->key = "CUNLISNUM";
 		$cle->value = $CUNLISNUM;
@@ -39,7 +39,7 @@ class Inventaire extends ModelX3 {
 		$cle = new CAdxParamKeyValue ();
 		$cle->key = "CUNLISSTA";
 		$cle->value = 1;
-        $WS_ORDER = "RINVV";
+        $WS_ORDER = "RINV";
 		$this->CAdxResultXml = $this->query ($WS_ORDER, Array($cle), 17 );
 		$result = $this->CAdxResultXml->resultXml;
 		$data = json_decode($result,true);
@@ -72,7 +72,7 @@ class Inventaire extends ModelX3 {
 	}
 
 	function update($CUNLISNUM,$CUNSSSNUM,$WS){
-		$WS_ORDER = "RINVV";
+		$WS_ORDER = "RINV";
 		$cle = new CAdxParamKeyValue ();
 		$cle->key = "CUNLISNUM";
 		$cle->value = $CUNLISNUM;
